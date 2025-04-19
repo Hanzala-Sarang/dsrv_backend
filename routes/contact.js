@@ -1,6 +1,7 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
+require("dotenv").config(); // Load .env file
 
 // POST /api/contact
 router.post("/", async (req, res) => {
@@ -11,20 +12,19 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    // Nodemailer transport setup for Hostinger
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || "smtp.hostinger.com", // Use environment variable or default
-      port: 465, // Typically 465 for SSL
-      secure: true, // Use SSL
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT) || 465,
+      secure: true, // SSL
       auth: {
-        user: process.env.EMAIL_USER, // Your Hostinger email address
-        pass: process.env.EMAIL_PASS, // Your Hostinger email password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: `"${name}" <${email}>`,
-      to: process.env.RECEIVER_EMAIL, // Your receiving email address
+      from: `"${name}" <${process.env.EMAIL_USER}>`, // Use your domain email as sender
+      to: process.env.RECEIVER_EMAIL,
       subject: `Contact Enquiry from ${name}`,
       html: `
         <h2>New Contact Request</h2>
@@ -35,11 +35,10 @@ router.post("/", async (req, res) => {
       `,
     };
 
-    // Send email
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent:", info.messageId);
-    res.status(200).json({ success: true, message: "Message sent successfully" });
 
+    res.status(200).json({ success: true, message: "Message sent successfully" });
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ success: false, error: "Email could not be sent" });
