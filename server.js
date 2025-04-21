@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const contactRoutes = require("./routes/contact");
+const feedbackRoutes = require("./routes/feedback")
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/contact", contactRoutes);
+app.use("/api/feedback", feedbackRoutes )
 
 // Server start
 const PORT = process.env.PORT || 5000;
